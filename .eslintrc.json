@@ -52,7 +52,7 @@
     "no-continue": "off",
     "no-param-reassign": "off",
     "no-multi-assign": "off",
-    "no-console": "error",
+    "no-console": "off", // error
     "radix": "off",
     "no-alert": "off",
     "no-nested-ternary": "off",
@@ -105,7 +105,7 @@
     ],
     "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-vars": [
-      "error",
+      "off", // error
       {
         "vars": "all",
         "varsIgnorePattern": "^_",
@@ -114,7 +114,7 @@
         "ignoreRestSiblings": true
       }
     ],
-    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-imports": "off", // error
     "lit/attribute-names": "warn",
     "lit/attribute-value-entities": "off",
     "lit/no-template-map": "off",

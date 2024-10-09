@@ -444,6 +444,7 @@ class HaSidebar extends SubscribeMixin(LitElement) {
     icon?: string | null,
     iconPath?: string | null
   ) {
+    console.log("panel urlpath", urlPath);
     return urlPath === "config"
       ? this._renderConfiguration(title)
       : html`

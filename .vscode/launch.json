@@ -6,7 +6,7 @@
       "request": "launch",
       "type": "pwa-chrome",
       "url": "http://localhost:8123/",
-      "webRoot": "${workspaceFolder}/hass_frontend",
+      "webRoot": "${workspaceFolder}/hass-frontend",
       "disableNetworkCache": true,
       "preLaunchTask": "Develop Frontend",
       "outFiles": ["${workspaceFolder}/hass_frontend/frontend_latest/*.js"]

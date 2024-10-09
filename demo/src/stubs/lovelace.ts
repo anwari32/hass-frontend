@@ -13,9 +13,18 @@ export const mockLovelace = (
   hass: MockHomeAssistant,
   localizePromise: Promise<LocalizeFunc>
 ) => {
+  console.log("mockLovelace");
   hass.mockWS("lovelace/config", ({ url_path }) => {
     if (url_path === "map") {
       hass.addEntities(mapEntities());
+      const _ws = new WebSocket("ws://localhost:8321/");
+      _ws.onopen = function (event) {
+        console.log(event);
+        _ws.send("map");
+      };
+      _ws.onmessage = function (event) {
+        console.log(event);
+      };
       return {
         strategy: {
           type: "map",
@@ -26,7 +35,6 @@ export const mockLovelace = (
       ([config, localize]) => config.lovelace(localize)
     );
   });
-
   hass.mockWS("lovelace/config/save", () => Promise.resolve());
   hass.mockWS("lovelace/resources", () => Promise.resolve([]));
 };

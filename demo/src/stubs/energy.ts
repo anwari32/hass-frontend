@@ -8,6 +8,7 @@ import {
 import { MockHomeAssistant } from "../../../src/fake_data/provide_hass";
 
 export const mockEnergy = (hass: MockHomeAssistant) => {
+  console.log("mockEnergy");
   hass.mockWS(
     "energy/get_prefs",
     (): EnergyPreferences => ({
@@ -27,6 +28,18 @@ export const mockEnergy = (hass: MockHomeAssistant) => {
               entity_energy_price: null,
               number_energy_price: null,
             },
+            {
+              stat_energy_from: "sensor.energy_consumption_tarif_3",
+              stat_cost: "sensor.energy_consumption_tarif_3_cost",
+              entity_energy_price: null,
+              number_energy_price: null,
+            },
+            {
+              stat_energy_from: "sensor.energy_consumption_tarif_4",
+              stat_cost: "sensor.energy_consumption_tarif_4_cost",
+              entity_energy_price: null,
+              number_energy_price: null,
+            },
           ],
           flow_to: [
             {
@@ -40,6 +53,27 @@ export const mockEnergy = (hass: MockHomeAssistant) => {
               stat_energy_to: "sensor.energy_production_tarif_2",
               stat_compensation:
                 "sensor.energy_production_tarif_2_compensation",
+              entity_energy_price: null,
+              number_energy_price: null,
+            },
+            {
+              stat_energy_to: "sensor.energy_production_tarif_3",
+              stat_compensation:
+                "sensor.energy_production_tarif_3_compensation",
+              entity_energy_price: null,
+              number_energy_price: null,
+            },
+            {
+              stat_energy_to: "sensor.energy_production_tarif_4",
+              stat_compensation:
+                "sensor.energy_production_tarif_4_compensation",
+              entity_energy_price: null,
+              number_energy_price: null,
+            },
+            {
+              stat_energy_to: "sensor.energy_production_tarif_5",
+              stat_compensation:
+                "sensor.energy_production_tarif_5_compensation",
               entity_energy_price: null,
               number_energy_price: null,
             },

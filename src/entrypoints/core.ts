@@ -8,6 +8,7 @@ import {
   subscribeEntities,
   subscribeServices,
 } from "home-assistant-js-websocket";
+import { C } from "@fullcalendar/core/internal-common";
 import { loadTokens, saveTokens } from "../common/auth/token_storage";
 import { hassUrl } from "../data/auth";
 import { isExternal } from "../data/external";
@@ -110,6 +111,37 @@ if (window.hassConnectionReady) {
 
 // Start fetching some of the data that we will need.
 window.hassConnection.then(({ conn }) => {
+  console.log("hass connection then");
+  const onFulfilled = function (response) {
+    if (response.status === 200) {
+      console.log("success", response.body);
+    }
+  };
+
+  const onRejected = function (response) {
+    console.log("rejected", response);
+  };
+
+  const static_url =
+    "http://raw.githubusercontent.com/anwari32/jsonrep/master/lovelace_config_dashboard_result.json";
+  const headers = {
+    "Content-type": "application/json",
+    "Access-Control-Allow-Origin": "http://localhost:8123",
+    "Access-Control-Allow-Methods": "GET",
+    "Access-Control-Allow-Headers":
+      "Origin, X-Requested-With, Content-Type, Accept",
+  };
+
+  console.log("headers", headers);
+
+  window
+    .fetch(static_url, {
+      method: "GET",
+      headers: headers,
+      mode: "cors",
+    })
+    .then(onFulfilled, onRejected);
+
   const noop = () => {
     // do nothing
   };
@@ -132,7 +164,11 @@ window.hassConnection.then(({ conn }) => {
     preloadWindow.llConfProm = fetchConfig(conn, null, false);
     preloadWindow.llConfProm.catch(() => {
       // Ignore it, it is handled by Lovelace panel.
+      console.log("Ignore it, it is handled by Lovelace panel.");
     });
+    console.log("fetch resources");
     preloadWindow.llResProm = fetchResources(conn);
+    console.log("llConfigProm", preloadWindow.llConfProm);
+    console.log("llResProm", preloadWindow.llResProm);
   }
 });

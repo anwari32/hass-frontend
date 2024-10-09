@@ -190,6 +190,8 @@ export class HaConfigLovelaceRescources extends LitElement {
 
   private async _getResources() {
     this._resources = await fetchResources(this.hass.connection);
+    console.log("this._resources");
+    console.log(this._resources);
   }
 
   private _editResource(ev: CustomEvent) {
