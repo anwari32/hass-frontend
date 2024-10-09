@@ -1,3 +1,19 @@
+# THIS IS AN EXPERIMENT REPO!!!
+
+Use it at your own risk!!!
+
+## How to run local websocket server
+
+1. Make sure you have suitable python environment.
+2. Navigate to `demo/src/iotera/server` folder.
+3. Run `python server.py.`
+
+## How to run local frontend demo server
+
+1. Make sure you have suitable python environment.
+2. Navigate to `demo` folder.
+3. Run `./develop_demo`
+
 # Home Assistant Frontend
 
 This is the repository for the official [Home Assistant](https://home-assistant.io) frontend.
