@@ -34,6 +34,8 @@ import {
   iotera_mockAuth,
   iotera_mockConfigEntries,
   iotera_mockEnergy,
+  iotera_mockEnergyEntities,
+  iotera_mockEnergyEntities_w_Promise,
   iotera_mockEntityRegistry,
   iotera_mockEvents,
   iotera_mockFrontend,
@@ -51,6 +53,7 @@ import {
 } from "./iotera/mock";
 
 import { IoteraConnection } from "./iotera/iotera";
+import { convertEntities } from "../../src/fake_data/entity";
 
 @customElement("ha-demo")
 export class HaDemo extends HomeAssistantAppEl {
@@ -191,10 +194,19 @@ export class HaDemo extends HomeAssistantAppEl {
       },
     ]);
 
-    const _energyEntities = energyEntities();
-    console.log("_initializeHass : " + JSON.stringify(_energyEntities));
+    console.log("try promise here.");
+    const energyEntitiesPromise = iotera_mockEnergyEntities_w_Promise(
+      iotera_connection,
+      hass
+    );
+    energyEntitiesPromise.then((msg) => {
+      console.log("hass add entities " + msg);
+      const _energyEntities = convertEntities(msg);
+      hass.addEntities(_energyEntities);
+    });
 
-    hass.addEntities(_energyEntities);
+    // const _energyEntities = energyEntities();
+    // hass.addEntities(_energyEntities);
 
     // Once config is loaded AND localize, set entities and apply theme.
     Promise.all([selectedDemoConfig, localizePromise]).then(
