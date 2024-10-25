@@ -5,6 +5,10 @@ const IOTERA_PORT = "8321";
 const IOTERA_PROTOCOL = "ws://";
 const IOTERA_SERVER = IOTERA_PROTOCOL + IOTERA_HOST + ":" + IOTERA_PORT;
 const IOTERA_LOG = "Iotera";
+const MAX_RETRY = 5;
+const MAX_TIMEDELTA = 1000; // 1 seconds.
+const MAX_ATTEMPT = 10;
+const INTERVAL_TIME = 100; // 100 ms.
 
 export interface IoteraMessage {
   id?: number;
@@ -34,24 +38,20 @@ export class IoteraConnection {
 
   constructor(socket: WebSocket) {
     this._handleMessages = (event) => {
-      console.log(IOTERA_LOG, "INCOMING", event);
-
       // what to do when receiving messages.
       const messageGroup = JSON.parse(event.data);
+      console.log(IOTERA_LOG, "INCOMING", messageGroup);
       messageGroup.forEach((msg) => {
-        console.log(msg);
         let msgInfo;
         switch (msg.type) {
           case "event":
             msgInfo = this._wsCommands.get(msg.id);
-            console.log("result => event callback to something " + msgInfo);
-            // msgInfo.callback(msg.event);
+            msgInfo.resolve(msg.event);
             break;
           case "result":
             msgInfo = this._wsCommands.get(msg.id);
-            console.log("result => result callback to something " + msgInfo);
             if (msgInfo !== undefined) {
-              msgInfo.resolve(msg.message);
+              msgInfo.resolve(msg.result);
             }
             break;
           default:
@@ -92,18 +92,46 @@ export class IoteraConnection {
     return this.socket.readyState === WebSocket.OPEN;
   }
 
-  sendMessage(message: IoteraMessage) {
-    setTimeout(() => {
-      console.log(IOTERA_LOG, "SOCKET STATE", this.socket.readyState);
-      if (this.socket.readyState === WebSocket.OPEN) {
-        if (!message.id) {
-          const messageId = this._genCommandId();
-          message.id = messageId;
+  _waitForOpenConnection(socket: WebSocket): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let attemptCount = 0;
+      const checkInterval = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          clearInterval(checkInterval);
+          resolve("websocket connection open.");
         }
-        console.log(IOTERA_LOG, "SENDING", message);
-        this.socket.send(JSON.stringify(message));
-      }
-    }, 5);
+        attemptCount += 1;
+        if (attemptCount > MAX_ATTEMPT) {
+          clearInterval(checkInterval);
+          reject(
+            "websocket connection failed. max attempt reached " + MAX_ATTEMPT
+          );
+        }
+      }, INTERVAL_TIME);
+    });
+  }
+
+  async sendMessage(message: IoteraMessage) {
+    if (!message.id) {
+      message.id = this._genCommandId();
+    }
+    if (!this.connected()) {
+      // wait until connection is open.
+      console.log(
+        IOTERA_LOG,
+        "WAITING WEBSOCKET TO OPEN",
+        this.socket.readyState
+      );
+      await this._waitForOpenConnection(this.socket);
+    }
+    this.socket.send(JSON.stringify(message));
+    console.log(
+      IOTERA_LOG,
+      "WEBSOCKET STATUS",
+      this.socket.readyState,
+      "SENDING MESSAGE",
+      message
+    );
   }
 
   sendMessagePromise(
@@ -111,14 +139,10 @@ export class IoteraConnection {
     hass: MockHomeAssistant
   ): Promise<any> {
     return new Promise((resolve, reject) => {
-      /**
-       * hass implementation contains message queueing here. not sure how that works.
-       * just return promise for use later.
-       */
       const commandId = this._genCommandId();
       message.id = commandId;
-      console.log("start promise " + JSON.stringify(message));
       this._wsCommands.set(commandId, { resolve, reject });
+      console.log(IOTERA_LOG, "SENDING PROMISE", message);
       this.sendMessage(message);
     });
   }
