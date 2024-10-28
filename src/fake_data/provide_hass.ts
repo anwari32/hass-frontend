@@ -105,6 +105,7 @@ export const provideHass = (
   }
 
   function updateStates(newStates: HassEntities) {
+    console.log("updateStates ", newStates);
     hass().updateHass({
       states: { ...hass().states, ...newStates },
     });
